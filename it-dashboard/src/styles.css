@@ -165,19 +165,12 @@ body {
   height: auto;
   display: block;
 }
-/* In light mode the white text is invisible — invert to dark */
-.app[data-theme="light"] .sidebar__logo {
-  filter: invert(1);
-}
 
 .kpi-header__logo {
   width: 120px;
   height: auto;
   display: block;
   margin-bottom: 10px;
-}
-.app[data-theme="light"] .kpi-header__logo {
-  filter: invert(1);
 }
 
 .sidebar__nav {
