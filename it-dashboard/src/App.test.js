@@ -83,6 +83,37 @@ test("allows an Admin to create a role-assigned user", () => {
   expect(screen.getByText("planner@tactivotechnologies.com")).toBeTruthy();
 });
 
+test("allows an Admin to reset a user passcode, reassign the role, and sign in as that user", () => {
+  render(<App />);
+  signInAsAdmin();
+  fireEvent.click(screen.getByRole("button", { name: /team access/i }));
+  fireEvent.click(screen.getByRole("button", { name: /add user/i }));
+  fireEvent.change(screen.getByLabelText(/full name/i), { target: { value: "Service Planner" } });
+  fireEvent.change(screen.getByLabelText(/email address/i), { target: { value: "planner@tactivotechnologies.com" } });
+  fireEvent.change(screen.getByLabelText(/^passcode/i), { target: { value: "secure123" } });
+  fireEvent.click(screen.getByRole("button", { name: /save changes/i }));
+  expect(screen.getByText("Service Planner")).toBeTruthy();
+
+  const originalPrompt = window.prompt;
+  window.prompt = () => "reset456";
+  fireEvent.click(screen.getAllByRole("button", { name: /reset passcode/i })[1]);
+  expect(screen.getByText(/^passcode reset$/i)).toBeTruthy();
+
+  fireEvent.click(screen.getAllByRole("button", { name: /^edit$/i })[1]);
+  fireEvent.change(screen.getByLabelText(/fieldops role/i), { target: { value: "technician" } });
+  fireEvent.click(screen.getByRole("button", { name: /save changes/i }));
+  expect(screen.getByText(/field technician/i)).toBeTruthy();
+
+  fireEvent.click(screen.getByRole("button", { name: /sign out/i }));
+  const accountSelect = screen.getByLabelText(/^account$/i);
+  const plannerOption = Array.from(accountSelect.options).find((option) => option.textContent.includes("Service Planner"));
+  fireEvent.change(accountSelect, { target: { value: plannerOption.value } });
+  fireEvent.change(screen.getByPlaceholderText(/enter passcode/i), { target: { value: "reset456" } });
+  fireEvent.click(screen.getByRole("button", { name: /^sign in$/i }));
+  expect(screen.getByText(/welcome, service planner/i)).toBeTruthy();
+  window.prompt = originalPrompt;
+});
+
 test("allows an Admin to open every operational record form", () => {
   render(<App />);
   signInAsAdmin();
