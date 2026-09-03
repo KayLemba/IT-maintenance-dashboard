@@ -1,0 +1,32 @@
+/* Purposeful keyboard focus rings for the local field-service workspace. */
+:focus-visible {
+  outline: 3px solid #d82173;
+  outline-offset: 3px;
+  box-shadow: 0 0 0 5px rgba(216, 33, 115, 0.18);
+}
+
+.relation-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+}
+
+.relation-links button {
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: #a40b4d;
+  padding: 2px 3px;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.relation-links button:hover {
+  background: #f7e7ee;
+}
+
+@media (min-width: 801px) {
+  .requests-head {
+    grid-template-columns: 0.6fr 1.45fr 1fr 0.55fr 0.65fr 0.65fr 0.55fr;
+  }
+}
