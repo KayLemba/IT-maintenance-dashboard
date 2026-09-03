@@ -268,3 +268,27 @@ test("requires technician signature evidence before work-order completion", () =
   HTMLCanvasElement.prototype.getContext = originalContext;
   HTMLCanvasElement.prototype.toDataURL = originalDataUrl;
 });
+
+test("allows every active role to recover a passcode with a one-time code", () => {
+  render(<App />);
+  signInAsAdmin();
+  createTechnicianAccount();
+  fireEvent.click(screen.getByRole("button", { name: /sign out/i }));
+  const accountSelect = screen.getByLabelText(/^account$/i);
+  const technicianOption = Array.from(accountSelect.options).find((option) => option.textContent.includes("Field Technician"));
+  fireEvent.change(accountSelect, { target: { value: technicianOption.value } });
+  fireEvent.click(screen.getByRole("button", { name: /forgot your passcode/i }));
+  fireEvent.change(screen.getByLabelText(/work email/i), { target: { value: "technician@tactivotechnologies.com" } });
+  fireEvent.click(screen.getByRole("button", { name: /generate reset code/i }));
+  const code = screen.getByText(/local reset code/i).nextSibling.textContent;
+  fireEvent.click(screen.getByRole("button", { name: /continue to set new passcode/i }));
+  fireEvent.change(screen.getByLabelText(/work email/i), { target: { value: "technician@tactivotechnologies.com" } });
+  fireEvent.change(screen.getByLabelText(/one-time code/i), { target: { value: code } });
+  fireEvent.change(screen.getAllByLabelText(/new passcode/i)[0], { target: { value: "recovered7" } });
+  fireEvent.change(screen.getAllByLabelText(/new passcode/i)[1], { target: { value: "recovered7" } });
+  fireEvent.click(screen.getByRole("button", { name: /update passcode/i }));
+  expect(screen.getByRole("heading", { name: /sign in to fieldops/i })).toBeTruthy();
+  fireEvent.change(screen.getByPlaceholderText(/enter passcode/i), { target: { value: "recovered7" } });
+  fireEvent.click(screen.getByRole("button", { name: /^sign in$/i }));
+  expect(screen.getByRole("heading", { name: /command centre/i })).toBeTruthy();
+});
